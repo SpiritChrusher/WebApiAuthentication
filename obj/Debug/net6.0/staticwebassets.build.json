@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "sfs9LCjsiy8wMsBbv9K+dAxQgxIkQH/wndi7tRvmhnE=",
+  "Source": "WebApiAuthentication",
+  "BasePath": "_content/WebApiAuthentication",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
