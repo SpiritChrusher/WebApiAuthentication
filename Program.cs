@@ -47,9 +47,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+//TODO: Adding JWT token bearer
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthentication();  
 app.UseAuthorization();  
   

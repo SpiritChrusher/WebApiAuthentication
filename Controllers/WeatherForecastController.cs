@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApiAuthentication.Authentication;
 
 namespace WebApiAuthentication.Controllers;
-
+[Authorize(Roles = UserRoles.Admin)]
 [ApiController]
 [Route("/weatherforecast")]
 public class WeatherForecastController : ControllerBase
