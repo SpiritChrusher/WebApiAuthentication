@@ -3,23 +3,32 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using WebApiAuthentication.Authentication;
+using WebApiAuthentication.DataAccess;
+using WebApiAuthentication.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var services = builder.Services;
+services.AddScoped<IPatientsRepository, PatientsRepository>();
 
-builder.Services.AddControllers();
+services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr")));
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  
+services.AddDbContext<PatientsContext>(optons =>
+    optons.UseSqlServer(builder.Configuration.GetConnectionString("ServerDb"))
+);
+
+services.AddIdentity<ApplicationUser, IdentityRole>()  
     .AddEntityFrameworkStores<ApplicationDbContext>()  
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(options =>
+services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -38,6 +47,38 @@ builder.Services.AddAuthentication(options =>
     };  
 });
 
+#if DEBUG
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = typeof(Program).Namespace, Version = "v1" });
+
+    var scheme = new OpenApiSecurityScheme()
+    {
+        Name = "Bearer",
+        Description = "Please enter you JWT",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    };
+
+    options.AddSecurityDefinition("JWT", scheme);
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = "JWT",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+#endif
 
 var app = builder.Build();
 
